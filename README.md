@@ -12,7 +12,7 @@ Project to use a Raspberry Pi Zero as an aftermarket IPMI (BMC, Drac, iDrac, et.
 1. Micro USB to USB A cable
 1. HDMI splitter (optional)
 
-# TODO:
+## TODO:
 - Code to send signals to the power and reset motherboard headers (may require transister or relay switch)
 - Code to read HDD and PLED motherboard headers (may require a resister or transister to lower the voltage from the motherboard)
 - Code that uses the Zero USB port to send keyboard and mouse signals to the host system.
