@@ -1,5 +1,5 @@
-# PiPMI
-Project to use a Raspberry Pi Zero as an aftermarket IPMI (BMC, Drac, iDrac, et. al.) adding enterprise functionality to consumer hardware. Ideal for resuing old desktop hardware for a homelab environment.
+# PiIB Manager
+Project to use a Raspberry Pi Zero as an aftermarket in-band management tool, adding enterprise functionality to consumer hardware. Ideal for resuing old desktop hardware for a homelab environment.
 
 ## Parts
 1. Raspberry Pi Zero WH ('H' has the headers. Get the W if you prefer soldered connections)
