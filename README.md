@@ -12,6 +12,9 @@ Project to use a Raspberry Pi Zero as an aftermarket in-band management tool, ad
 1. Micro USB to USB A cable
 1. HDMI splitter (optional)
 
+## Wiring
+![ alt text](https://github.com/dev-dull/PiIB-Manager/blob/master/images/diagrams/piib.png?raw=true "Wiring diagram")
+
 ## TODO:
 - Code to send signals to the power and reset motherboard headers (may require transistor or relay switch)
 - Code to read HDD and PLED motherboard headers (may require a resister or transistor to lower the voltage from the motherboard)
