@@ -49,6 +49,7 @@ confs =  fin.read()
 fin.close()
 conf = yaml.load(confs, Loader=yaml.SafeLoader)
 
+
 for k,v in conf.items():
     setattr(C, k, v)    
 
