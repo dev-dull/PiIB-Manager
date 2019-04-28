@@ -41,6 +41,9 @@ class C(object):
     
     PIN_ALL_PINS = []
     PIN_DATA_PINS = []
+    
+    ON = 1
+    OFF = 0
 
 
 ## Set values specified by the user in the config.
@@ -100,3 +103,6 @@ C.PIN_ALL_PINS = C.PIN_3V3_POWER + C.PIN_5V_POWER + C.PIN_BCM_0_ID_SD +\
                C.PIN_BCM_26 + C.PIN_BCM_27 + C.PIN_GROUND
 C.PIN_DATA_PINS = filter(lambda p: p not in C.PIN_GROUND + C.PIN_3V3_POWER
                        + C.PIN_5V_POWER, C.PIN_ALL_PINS)
+
+C.ON = 1
+C.OFF = 0
