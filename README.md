@@ -22,7 +22,7 @@ Project to use a Raspberry Pi Zero as an aftermarket in-band management tool, ad
 - Some motherboards have a jumper that can enable keeping the (5v) USB power on even when the machine is powered off
     - inadequate for a Pi 3 (the warning lightning bolt appears intermittently)
     - Pi Zero W runs normally
-- If no 5v USB jumper is available, pin 9 (color coded purple) 
+- If no 5v USB jumper is available, pin 9 (color coded purple) on a 20 or 24 pin motherboard power connector.
     - an always-on 5v line.
     - Untested, but should be the same power source as the mentioned USB jumper.
 
