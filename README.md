@@ -24,6 +24,14 @@ Project to use a Raspberry Pi Zero as an aftermarket in-band management tool, ad
     - keyboard and mouse
     - USB storage device
     - [see gist on how to configure the Pi to be multiple devices](https://gist.github.com/gbaman/50b6cca61dd1c3f88f41)
+- Code that captures HDMI (camera) input and shows it in some kind of UI
+    - [capture camera to network stream](https://picamera.readthedocs.io/en/release-1.13/recipes1.html#capturing-to-a-network-stream) (a network stream might allow some other interesting uses later).
+    - [capture images and show in a tkinter GUI app](https://stackoverflow.com/questions/16366857/show-webcam-sequence-tkinter)
+    - [same as above, but in-depth](https://www.pyimagesearch.com/2016/05/30/displaying-a-video-feed-with-opencv-and-tkinter/) (this is from 2016)
+    - [capture images and show in a PySimpleGUI app](https://www.youtube.com/watch?v=-Dp2_X9q7GU) (no link to code D: )
+    - [open source app that does on-the-fly camera adjustmets including resolution and digital zoom](https://github.com/amchagas/Flypi)
+    - [PiCameraApp has _appears_ to have on-the-fly camera adjustments](https://github.com/Billwilliams1952/PiCameraApp) (This looks like the best bet for seeing exammples on how to get started.)
+    - Tkinter appears to be the most popular platform for GUI development on the Pi.
 - Pi config that enables a remote desktop
 - Config Management code (puppet, probably) to set up the device.
 - Additional research needed for...
