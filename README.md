@@ -26,6 +26,9 @@ Project to use a Raspberry Pi Zero as an aftermarket in-band management tool, ad
     - [see gist on how to configure the Pi to be multiple devices](https://gist.github.com/gbaman/50b6cca61dd1c3f88f41)
 - Pi config that enables a remote desktop
 - Config Management code (puppet, probably) to set up the device.
+- Additional research needed for...
+    - Thermocouples to monitor temperatures
+    - [Monitor PSU voltages](https://www.raspberrypi.org/forums/viewtopic.php?t=57480)
 
 # Potential 5v power sources for the Pi
 - Some motherboards have a jumper that can enable keeping the (5v) USB power on even when the machine is powered off
