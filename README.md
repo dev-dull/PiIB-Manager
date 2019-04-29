@@ -16,10 +16,16 @@ Project to use a Raspberry Pi Zero as an aftermarket in-band management tool, ad
 ![ alt text](https://github.com/dev-dull/PiIB-Manager/blob/master/images/diagrams/piib.png?raw=true "Wiring diagram")
 
 ## TODO:
-- Code to send signals to the power and reset motherboard headers (may require transistor or relay switch)
-- Code to read HDD and PLED motherboard headers (may require a resister or transistor to lower the voltage from the motherboard)
-- Code that uses the Zero USB port to send keyboard and mouse signals to the host system.
+- Code to send signals to the reset motherboard header
+    - See Power Button code
+- Code to read HDD and PC speaker headers
+    - See Power LED code
+- Code that uses the Zero USB port to tell host system it is a device.
+    - keyboard and mouse
+    - USB storage device
+    - [see gist on how to configure the Pi to be multiple devices](https://gist.github.com/gbaman/50b6cca61dd1c3f88f41)
 - Pi config that enables a remote desktop
+- Config Management code (puppet, probably) to set up the device.
 
 # Potential 5v power sources for the Pi
 - Some motherboards have a jumper that can enable keeping the (5v) USB power on even when the machine is powered off
@@ -30,8 +36,11 @@ Project to use a Raspberry Pi Zero as an aftermarket in-band management tool, ad
     - Untested, but should be the same power source as the mentioned USB jumper.
 
 ## Testing results:
-NOTE: The headers on the raspberry pi were too short to make electrical contact with the female connector of the breadboard jumpers I was testing with.
+NOTE: Always test jumper wires for continuity before using.
 
 - Powering up the machine:
     - Directly applying 3.3v and 5v to either pin on the power switch headers on the motherboard failed to boot the machine.
-    - Using a transister (PN2222A) across the power switch pinouts on the motherboard worked when 3.3v was applied to the base pin (5v also worked, but the gpio pins of the Pi can only ouput 3.3v)
+    - Using a transister (PN2222A) across the power switch pinouts on the motherboard worked with a GPIO pin 16 -- see diagram
+
+- Monitoring the Power LED
+    - Attaching the the base pin of a transister to the posittive pin of the motherboard PLED connector, then wiring the emmittter and collector to a +3.3v pin and GPIO pin 18 let us read the PLED status.
