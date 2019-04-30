@@ -55,3 +55,8 @@ NOTE: Always test jumper wires for continuity before using.
 
 - Monitoring the Power LED
     - Attaching the the base pin of a transister to the posittive pin of the motherboard PLED connector, then wiring the emmittter and collector to a +3.3v pin and GPIO pin 18 let us read the PLED status.
+
+- Auvidea HDMI bridges
+    - The B101 (for the Pi 3) hasn't worked well (although my HDMI source may be to blame here).
+    - The B102 (for the Pi Zero WH) has been working much more consistantly.
+    - Further testing is needed but it looks like neither one can handle boot screens (post test, bios screen) and resolution switching.
