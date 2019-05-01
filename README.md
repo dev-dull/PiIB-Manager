@@ -45,6 +45,7 @@ Project to use a Raspberry Pi Zero as an aftermarket in-band management tool, ad
 - If no 5v USB jumper is available, pin 9 (color coded purple) on a 20 or 24 pin motherboard power connector.
     - an always-on 5v line.
     - Untested, but should be the same power source as the mentioned USB jumper.
+- The brave or vaguely foolish could wire a standard wall AC to 5v DC adapter to the power connector inside the ATX power supply.
 
 ## Testing results:
 NOTE: Always test jumper wires for continuity before using.
