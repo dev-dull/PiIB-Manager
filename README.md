@@ -57,6 +57,12 @@ NOTE: Always test jumper wires for continuity before using.
 - Monitoring the Power LED
     - Attaching the the base pin of a transister to the posittive pin of the motherboard PLED connector, then wiring the emmittter and collector to a +3.3v pin and GPIO pin 18 let us read the PLED status.
 
+- Monitoring the HDD LED:
+    - Figured out (the hard way) that the negitive pin on the HDD LED pinout _reduces_ voltage to the negitive pin to activate teh HDD activity LED.
+    - [@mckern](https://github.com/mckern) helpfully linked [this forum post that confirmed my testing](htttps://forum.allaboutcircuits.com/threads/pc-hard-drive-activity-led.69991/)
+    - So far so good using the NPN 2N3904 transistor that came in a kit from Sparkfun (NOTE: invert value that is read from code when using an NPN trasistor).
+    - So far so good using the PNP 2N3906 transistor that came in a kit from Sparkfun.
+
 - Auvidea HDMI bridges
     - The B101 (for the Pi 3) hasn't worked well (although my HDMI source may be to blame here).
     - The B102 (for the Pi Zero WH) has been working much more consistantly.

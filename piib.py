@@ -1,6 +1,5 @@
 import yaml
 import logging
-import gpiozero
 
 from CONSTS import C
 from RPi import GPIO
@@ -15,8 +14,10 @@ def main():
 
     # set up GPIO input pins
     GPIO.setup(C.POWER_LED_PIN, GPIO.IN)
+    GPIO.setup(C.HDD_LED_PIN, GPIO.IN)
 
     power_toggle()
+    read_hdd_led_until(max_tries=500)
     GPIO.cleanup()
 
 #######################################################################
@@ -44,8 +45,22 @@ def power_button(led_status):
 ## Disk operations
 #######################################################################
 def read_hdd_led():
-    pass
+    # Currently set up to evaluate value from PNP transistor.
+    hdd_status = GPIO.input(C.HDD_LED_PIN)
+    logging.info('HDD LED: %s' % hdd_status)
+    return hdd_status == 1  # Are you inverting this logic? Did you update the previous comment first?
+    
+def read_hdd_led_until(max_tries=25):
+    while max_tries:
+        read_hdd_led()
+        sleep(C.OPERATION_WAIT_DURATION)
+        max_tries -= 1
 
+# TODO: Generic read_pin function that gets used by all these read_FUNC_led functions
+
+#######################################################################
+## Glue
+#######################################################################
 if __name__ == '__main__':
     logging.basicConfig(format='{"timestamp": "%(asctime)s", '
                         '"log_name": "%(name)s", '
