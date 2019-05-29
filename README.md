@@ -20,6 +20,9 @@ Project to use a Raspberry Pi Zero as an aftermarket in-band management tool, ad
     - See Power Button code
 - Code to read HDD and PC speaker headers
     - See Power LED code
+    - Partially implemented but needs to take into account the following:
+        - The postive pin is always 5v (on most mobotherboards).
+        - The voltage on the negitive pin goes low to activate the HDD LED.
 - Code that uses the Zero USB port to tell host system it is a device.
     - keyboard and mouse
     - USB storage device
