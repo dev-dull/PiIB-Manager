@@ -6,7 +6,7 @@ Project to use a Raspberry Pi Zero as an aftermarket in-band management tool, ad
     1. Power supply (for getting started)
     1. Keyboard + Mouse (for getting started)
     1. Micro SD card (for OS)
-1. Auvidea B102 HDMI to CSI-2 Bridge (get the 101 if you're _not_ using a Pi Zero. Do _*NOT*_ combine the Pi Zero, the B101, and the official Pi camera adaptor ribbon cable)
+1. Auvidea B102 HDMI to CSI-2 Bridge
 1. Breadboard jumper cables (other wiring could work, but the tips will come in helpful here.
 1. HDMI cables
 1. Micro USB to USB A cable
@@ -64,6 +64,6 @@ NOTE: Always test jumper wires for continuity before using.
     - So far so good using the PNP 2N3906 transistor that came in a kit from Sparkfun.
 
 - Auvidea HDMI bridges
-    - The B101 (for the Pi 3) hasn't worked well (although my HDMI source may be to blame here).
-    - The B102 (for the Pi Zero WH) has been working much more consistantly.
-    - Further testing is needed but it looks like neither one can handle boot screens (post test, bios screen) and resolution switching.
+    - The B101 (for the Pi 3) Only supports 1080p at 25fps -- a resolution and refresh rate not likely to be supported during boot up.
+    - The B102 (for the Pi Zero WH) has been working much more consistantly (it supports a wider range of resolutions starting at 720p).
+    - The B102 was able to show a motherboard boot splash (shown by the BIOS/UEFI) but it was cropped and rapsivid didn't like the resolution change that promptly followed.
