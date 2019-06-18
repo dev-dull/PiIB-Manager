@@ -30,9 +30,10 @@ def main():
             monitored_pins[name].start()
 
     #power_toggle()
-    read_hdd_led_until(max_tries=500)
+    #read_hdd_led_until(max_tries=500)
     for name,monitored_pin in monitored_pins.items():
         # Tell the thread that monitors the pin to stop checking.
+        sleep(2)
         monitored_pin.continue_monitoring = False
     GPIO.cleanup()
 
