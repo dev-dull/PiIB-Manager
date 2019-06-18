@@ -9,12 +9,12 @@ class C(object):
 
     # Just declare these exist so IDEs don't complain. Actual values
     # are set below so that users can't override values in config.yaml
-    KEYWORD_FP_HEADERS_WRITE = ''
-    KEYWORD_FP_HEADERS_READ = ''
+    KEYWORD_FP_HEADERS_WRITE = 'FP_HEADERS_WRITE'
+    KEYWORD_FP_HEADERS_READ = 'FP_HEADERS_WRITE'
     KEYWORD_SAMPLING_WAIT_TIME = ''
 
     KEYWORD_POWER_LED_PIN = ''
-    KEYWORD_HDD_LED_PIN = ''
+    KEYWORD_HDD_LED_PIN = 'HDD_LED_PIN'
     KEYWORD_PC_SPEAKER_PIN = ''
 
     KEYWORD_POWER_BUTTON_PIN = ''

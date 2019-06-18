@@ -14,14 +14,14 @@ def main():
     # Set up GPIO output pins
     global write_pins
     write_pins = {}
-    for name,pin in getattr(C, C.KEYWORD_FP_HEADERS_WRITE):
+    for name,pin in getattr(C, C.KEYWORD_FP_HEADERS_WRITE).items():
         GPIO.setup(pin, GPIO.OUT)
         write_pins[name] = pin
 
     # set up GPIO input pins
     global monitored_pins
     monitored_pins = {}
-    for name,pin in getattr(C, C.KEYWORD_FP_HEADERS_READ):
+    for name,pin in getattr(C, C.KEYWORD_FP_HEADERS_READ).items():
         # If the pin is set to <=0, skip it.
         if pin > 0:
             GPIO.setup(pin, GPIO.IN)
@@ -29,7 +29,7 @@ def main():
             # Start a thread that monitors the pin
             monitored_pins[name].start()
 
-    power_toggle()
+    #power_toggle()
     read_hdd_led_until(max_tries=500)
     for name,monitored_pin in monitored_pins.items():
         # Tell the thread that monitors the pin to stop checking.
@@ -79,7 +79,7 @@ def power_button(until_func):
 #######################################################################
 def read_hdd_led():
     # Currently set up to evaluate value from PNP transistor.
-    hdd_status = GPIO.input(C.HDD_LED_PIN)
+    hdd_status = GPIO.input(getattr(C, C.KEYWORD_FP_HEADERS_READ)[C.KEYWORD_HDD_LED_PIN])  # TODO: ew.
     logging.info('HDD LED: %s' % hdd_status)
     return hdd_status == 1  # Are you inverting this logic? Did you update the previous comment first?
 
