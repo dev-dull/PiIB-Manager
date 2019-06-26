@@ -10,6 +10,9 @@ from functools import partial
 from piib_gpio import PinMonitor
 
 
+app = Flask('piib_ui')
+
+
 #######################################################################
 # UI
 #######################################################################
@@ -25,7 +28,7 @@ def ui():
 #######################################################################
 # Get data
 #######################################################################
-@app_route('host_status')
+@app.route('/host_status')
 def host_status():
     # TODO: monitored_pins[name] should probably return the status automatically without needing to specify the '.status'
     #       then we can just `return dict(monitored_pins)` to simplify the code here.
@@ -76,22 +79,20 @@ def mouse_move(action):
     
 
 @app.route('/key/<action>')
-def reset_button_action(action):
+def keyboard(action):
     #TODO: key down, up, 
     return "not yet", 501
 
 
-@app.route('/key')
+@app.route('/screen')
 def screen():
-    #TODO: key down, up, 
+    #TODO: return jpeg frame 
     return "not yet", 501
     
 
 #######################################################################
 # Setup
 #######################################################################
-app = Flask('piib_ui')
-
 def _gpio_setup():
     # Set up board
     GPIO.setmode(GPIO.BOARD)
@@ -132,7 +133,7 @@ if __name__ == '__main__':
 
     _gpio_setup()
     global picamera
-    picamera = PiCamera()
+    picamera = PiCamera()  # On first test, got a resource error suggesting the camera is in use. Could be `raspivid` didn't cleanup after itself, maybe???
     picamera.resolution=(1024, 768)  # We might want to make this user configurable since better versions of the B101/2 might get released.
     picamera.start_preview()  # TODO: it might not make sense to do this here.
     app.run(host='0.0.0.0', port='5112')
