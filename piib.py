@@ -4,10 +4,95 @@ import logging
 from CONSTS import C
 from RPi import GPIO
 from time import sleep
+from flask import Flask
+from picamera import PiCamera
 from functools import partial
 from piib_gpio import PinMonitor
 
-def main():
+
+#######################################################################
+# UI
+#######################################################################
+@app.route('/')
+def ui():
+    return '''
+    <h1>hello, world!"</h1>
+    hdd: %s<br />
+    power: %s
+    ''' % (monitored_pins['HDD_LED_PIN'].status, monitored_pins['POWER_LED_PIN'].status)
+
+
+#######################################################################
+# Get data
+#######################################################################
+@app_route('host_status')
+def host_status():
+    # TODO: monitored_pins[name] should probably return the status automatically without needing to specify the '.status'
+    #       then we can just `return dict(monitored_pins)` to simplify the code here.
+    status = {}
+    for name,pin in monitored_pins.items():
+        status[name] = pin.status
+    return status, 200, {'Content-type': 'application/json'}
+
+#~ @app.route('/power_led')
+#~ def power_led():
+    #~ return monitored_pins[C.KEYWORD_POWER_LED_PIN].status
+ 
+ 
+#~ @app.route('/hdd_led')
+#~ def hdd_led():
+    #~ return monitored_pins[C.KEYWORD_HDD_LED_PIN].status
+
+
+#~ @app.route('/pc_speaker')
+#~ def pc_speaker():
+    #~ return monitored_pins[C.KEYWORD_PC_SPEAKER_PIN].status
+
+
+#######################################################################
+# Set data
+#######################################################################
+# TODO: it might make more sense to make the input a single function where the user must specify the action (force poweroff, press power button, press reset button, etc)
+@app.route('/power_button/<action>')
+def power_button_action(action):
+    #TODO:
+    return "not yet", 501
+    
+
+@app.route('/reset_button/<action>')
+def reset_button_action(action):
+    #TODO:
+    return "not yet", 501
+
+
+#######################################################################
+# I/O
+#######################################################################
+# TODO: these functions probably make zero sense as they exist. They're just here as a sort of roadmap.
+@app.route('/mouse_move/<action>')
+def mouse_move(action):
+    #TODO: move left, move right, up, down
+    return "not yet", 501
+    
+
+@app.route('/key/<action>')
+def reset_button_action(action):
+    #TODO: key down, up, 
+    return "not yet", 501
+
+
+@app.route('/key')
+def screen():
+    #TODO: key down, up, 
+    return "not yet", 501
+    
+
+#######################################################################
+# Setup
+#######################################################################
+app = Flask('piib_ui')
+
+def _gpio_setup():
     # Set up board
     GPIO.setmode(GPIO.BOARD)
 
@@ -31,70 +116,12 @@ def main():
 
     #power_toggle()
     #read_hdd_led_until(max_tries=500)
-    for name,monitored_pin in monitored_pins.items():
-        # Tell the thread that monitors the pin to stop checking.
-        sleep(2)
-        monitored_pin.continue_monitoring = False
-    GPIO.cleanup()
+    #~ for name,monitored_pin in monitored_pins.items():
+        #~ # Tell the thread that monitors the pin to stop checking.
+        #~ sleep(2)
+        #~ monitored_pin.continue_monitoring = False
 
 
-def read_pin_until(pin, until_func=C.NPN_ON_CHECK, max_tries=25):
-    while read_pin(pin, until_func) and max_tries:
-        max_tries -= 1
-        sleep(C.SAMPLING_WAIT_TIME)
-    else:
-        # while loop + elif is not a thing, apparently.
-        if max_tries == 0:
-            logging.info('max tries for reading %s state change exhausted.' % pin.name)
-
-
-def read_pin(pin, func=C.NPN_ON_CHECK):
-    return func(pin.status)
-
-
-#######################################################################
-# Power operations
-#######################################################################
-def read_power_led():
-    return read_pin(monitored_pins[C.KEYWORD_POWER_LED_PIN], func=C.NPN_ON_CHECK)
-
-
-# def read_power_led_until(status, max_tries=25):
-#     while read_power_led() != status and max_tries:
-#         sleep(C.OPERATION_WAIT_DURATION)
-#         max_tries -= 1
-
-
-def power_toggle():
-    power_button(C.NPN_OFF_CHECK if read_power_led() else C.NPN_ON_CHECK)
-
-
-def power_button(until_func):
-    GPIO.output(write_pins[C.KEYWORD_POWER_BUTTON_PIN], C.ON)
-    read_pin_until(monitored_pins[C.KEYWORD_POWER_LED_PIN], until_func=until_func)
-    GPIO.output(write_pins[C.KEYWORD_POWER_BUTTON_PIN], C.OFF)
-
-
-#######################################################################
-# Disk operations
-#######################################################################
-def read_hdd_led():
-    # Currently set up to evaluate value from PNP transistor.
-    hdd_status = GPIO.input(getattr(C, C.KEYWORD_FP_HEADERS_READ)[C.KEYWORD_HDD_LED_PIN])  # TODO: ew.
-    logging.info('HDD LED: %s' % hdd_status)
-    return hdd_status == 1  # Are you inverting this logic? Did you update the previous comment first?
-
-
-def read_hdd_led_until(max_tries=25):
-    while max_tries:
-        read_hdd_led()
-        sleep(C.SAMPLING_WAIT_TIME)
-        max_tries -= 1
-
-
-#######################################################################
-# Glue
-#######################################################################
 if __name__ == '__main__':
     logging.basicConfig(format='{"timestamp": "%(asctime)s", '
                         '"log_name": "%(name)s", '
@@ -103,4 +130,11 @@ if __name__ == '__main__':
     logger = logging.getLogger('')
     logger.setLevel(getattr(logging, C.LOG_LEVEL.upper(), 'INFO'))
 
-    main()
+    _gpio_setup()
+    global picamera
+    picamera = PiCamera()
+    picamera.resolution=(1024, 768)  # We might want to make this user configurable since better versions of the B101/2 might get released.
+    picamera.start_preview()  # TODO: it might not make sense to do this here.
+    app.run(host='0.0.0.0', port='5112')
+    GPIO.cleanup()
+    picamera.stop_preview()

@@ -14,4 +14,4 @@ class PinMonitor(threading.Thread):
         # TODO: Test if the main thread can get a garbage due to a partially saved value. Add locking if so.
         while self.continue_monitoring:
             self.status = self.read_pin()
-            print(self.pin_name, self.status)
+            #print(self.pin_name, self.status)
