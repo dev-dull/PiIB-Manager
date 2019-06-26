@@ -1,11 +1,11 @@
 import yaml
 import logging
+import picamera
 
 from CONSTS import C
 from RPi import GPIO
 from time import sleep
 from flask import Flask
-from picamera import PiCamera
 from functools import partial
 from piib_gpio import PinMonitor
 
@@ -86,7 +86,19 @@ def keyboard(action):
 
 @app.route('/screen')
 def screen():
-    #TODO: return jpeg frame 
+    # the "start_preview()" function that all tutorials say to run actually start a visual preview which isn't the desired result here.
+    if display:
+        try:
+            cam = picamera.PiCamera()
+        except picamera.exc.PiCameraMMALError as e:
+            # We've never set up 'cam' and this error tells us there's no signal yet
+            # TODO: return "no signal"
+            pass
+        except picamera.exc.PiCameraRuntimeError as e:
+            # We had a signal, but this error means we lost it
+            #TODO: return "no signal"
+            pass
+    # TODO: regurn a jpeg image (as an rtsp stream?)
     return "not yet", 501
     
 
@@ -132,10 +144,9 @@ if __name__ == '__main__':
     logger.setLevel(getattr(logging, C.LOG_LEVEL.upper(), 'INFO'))
 
     _gpio_setup()
-    global picamera
-    picamera = PiCamera()  # On first test, got a resource error suggesting the camera is in use. Could be `raspivid` didn't cleanup after itself, maybe???
-    picamera.resolution=(1024, 768)  # We might want to make this user configurable since better versions of the B101/2 might get released.
-    picamera.start_preview()  # TODO: it might not make sense to do this here.
+    global display
+    display = None
+    
     app.run(host='0.0.0.0', port='5112')
     GPIO.cleanup()
     picamera.stop_preview()
