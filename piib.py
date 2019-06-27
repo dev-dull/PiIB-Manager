@@ -98,6 +98,9 @@ def _format_rtp_frame(frame):
 
 @app.route('/screen')
 def screen():
+    # TODO: replicate the second answer shipping over a static image and see if that works.
+    # see answer 2: https://stackoverflow.com/questions/21197638/create-a-mjpeg-stream-from-jpeg-images-in-python
+    
     # the "start_preview()" function that all tutorials say to run actually start a visual preview which isn't the desired result here.
     global screen_image
     try:
@@ -108,7 +111,7 @@ def screen():
         # PiCameraMMALError: We've never set up 'screen_image' and this error tells us there's no signal yet
         # PiCameraRuntimeError: We had a signal, but this error means we lost it
         screen_image = None
-        fin = open('images/no-signal.jpg', 'rb')
+        fin = open('images/no-signal.jpg', 'rb')  # All this hard-coded garbage is just temporary proof-of-concept work.
         no_signal = fin.read()
         fin.close()
         frame = _format_rtp_frame(no_signal)
