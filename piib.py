@@ -1,3 +1,4 @@
+import io
 import yaml
 import logging
 import picamera
@@ -5,9 +6,9 @@ import picamera
 from CONSTS import C
 from RPi import GPIO
 from time import sleep
-from flask import Flask
 from functools import partial
 from piib_gpio import PinMonitor
+from flask import Flask, Response
 
 
 app = Flask('piib_ui')
@@ -83,24 +84,37 @@ def keyboard(action):
     #TODO: key down, up, 
     return "not yet", 501
 
+def _get_frame():
+    # TODO: I like the idea of making this a generator, but I'm not sure if that really gains me anything useful
+    frame = io.BytesIO()
+    screen_image.capture(frame, 'jpeg')  # TODO: the second param here is probably optional. Specify the exact name instead of going by positional.
+    return frame.read()
+
+
+def _format_rtp_frame(frame):
+    return Response(b'--frame\r\nContent-Type: image/jpeg\r\n\r\n'+frame+b'\r\n',
+                    mimetype='multipart/x-mixed-replace; boundry=frame')
+
 
 @app.route('/screen')
 def screen():
     # the "start_preview()" function that all tutorials say to run actually start a visual preview which isn't the desired result here.
-    if display:
-        try:
-            cam = picamera.PiCamera()
-        except picamera.exc.PiCameraMMALError as e:
-            # We've never set up 'cam' and this error tells us there's no signal yet
-            # TODO: return "no signal"
-            pass
-        except picamera.exc.PiCameraRuntimeError as e:
-            # We had a signal, but this error means we lost it
-            #TODO: return "no signal"
-            pass
-    # TODO: regurn a jpeg image (as an rtsp stream?)
-    return "not yet", 501
-    
+    global screen_image
+    try:
+        if screen_image is None:
+            screen_image = picamera.PiCamera()
+        frame = _format_rtp_frame(_get_frame())
+    except (picamera.exc.PiCameraMMALError, picamera.exc.PiCameraRuntimeError) as e:
+        # PiCameraMMALError: We've never set up 'screen_image' and this error tells us there's no signal yet
+        # PiCameraRuntimeError: We had a signal, but this error means we lost it
+        screen_image = None
+        fin = open('images/no-signal.jpg', 'rb')
+        no_signal = fin.read()
+        fin.close()
+        frame = _format_rtp_frame(no_signal)
+
+    return frame
+ 
 
 #######################################################################
 # Setup
@@ -127,13 +141,6 @@ def _gpio_setup():
             # Start a thread that monitors the pin
             monitored_pins[name].start()
 
-    #power_toggle()
-    #read_hdd_led_until(max_tries=500)
-    #~ for name,monitored_pin in monitored_pins.items():
-        #~ # Tell the thread that monitors the pin to stop checking.
-        #~ sleep(2)
-        #~ monitored_pin.continue_monitoring = False
-
 
 if __name__ == '__main__':
     logging.basicConfig(format='{"timestamp": "%(asctime)s", '
@@ -144,9 +151,8 @@ if __name__ == '__main__':
     logger.setLevel(getattr(logging, C.LOG_LEVEL.upper(), 'INFO'))
 
     _gpio_setup()
-    global display
-    display = None
+    global screen_image
+    screen_image = None
     
     app.run(host='0.0.0.0', port='5112')
     GPIO.cleanup()
-    picamera.stop_preview()
