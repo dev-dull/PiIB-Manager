@@ -16,7 +16,11 @@ Project to use a Raspberry Pi Zero as an aftermarket in-band management tool, ad
 ![ alt text](https://github.com/dev-dull/PiIB-Manager/blob/master/images/diagrams/piib.png?raw=true "Wiring diagram")
 
 ## Current POC video
+### Powering on/off by monitoring PLED
 [![Proof of concept -- turing on and off a PC based on PLED status](http://img.youtube.com/vi/p5ljNyCBwSM/0.jpg)](https://www.youtube.com/watch?v=p5ljNyCBwSM "PiIB proof-of-concept - power on/off with PLED detection")
+
+### Capture and show HDMI display to the web
+[![PiIB proof-of-concept - web based video display](http://img.youtube.com/vi/lVJjcQJwvOE/0.jpg)](https://www.youtube.com/watch?v=lVJjcQJwvOE "PiIB proof-of-concept - power on/off with PLED detection")
 
 ## TODO:
 - Code to send signals to the reset motherboard header
