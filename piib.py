@@ -84,37 +84,44 @@ def keyboard(action):
     #TODO: key down, up, 
     return "not yet", 501
 
-def _get_frame():
-    # TODO: I like the idea of making this a generator, but I'm not sure if that really gains me anything useful
-    frame = io.BytesIO()
-    screen_image.capture(frame, 'jpeg')  # TODO: the second param here is probably optional. Specify the exact name instead of going by positional.
-    return frame.read()
-
-
-def _format_rtp_frame(frame):
-    return Response(b'--frame\r\nContent-Type: image/jpeg\r\n\r\n'+frame+b'\r\n',
-                    mimetype='multipart/x-mixed-replace; boundry=frame')
-
 
 @app.route('/screen')
 def screen():
-    # the "start_preview()" function that all tutorials say to run actually start a visual preview which isn't the desired result here.
-    global screen_image
-    try:
-        if screen_image is None:
-            screen_image = picamera.PiCamera()
-        frame = _format_rtp_frame(_get_frame())
-    except (picamera.exc.PiCameraMMALError, picamera.exc.PiCameraRuntimeError) as e:
-        # PiCameraMMALError: We've never set up 'screen_image' and this error tells us there's no signal yet
-        # PiCameraRuntimeError: We had a signal, but this error means we lost it
-        screen_image = None
-        fin = open('images/no-signal.jpg', 'rb')
-        no_signal = fin.read()
-        fin.close()
-        frame = _format_rtp_frame(no_signal)
+    return Response(frame_generator(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-    return frame
- 
+
+def frame_generator():
+    """Video streaming generator function."""
+    fin = open('images/no-signal.jpg', 'rb')
+    no_signal = fin.read()
+    fin.close()
+
+    screen_handle = None
+    frame_buffer = io.BytesIO()
+    while True:
+        frame = no_signal
+        if screen_handle:
+            try:
+                frame_buffer.seek(0)
+                screen_handle.capture(frame_buffer, 'jpeg')
+                frame_buffer.truncate()
+                frame_buffer.seek(0)
+                frame = frame_buffer.read()
+            except picamera.exc.PiCameraRuntimeError as e:
+                # We had gotten a picture from the camera at some point, but have since lost signal.
+                # Reset the handle to force a new init of the variable on the next pass of the loop.
+                screen_handle = None
+                # frame = no_signal
+        else:
+            try:
+                screen_handle = picamera.PiCamera()
+            except picamera.exc.PiCameraMMALError as e:
+                # We have never gotten a signal and failed to get one just now.
+                # screen_handle = None  # Not sure if we need screen_handle nulled out. Probably not.
+                pass
+
+        yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
 
 #######################################################################
 # Setup
