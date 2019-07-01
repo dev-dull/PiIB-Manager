@@ -1,3 +1,4 @@
+import io
 import yaml
 import logging
 import picamera
@@ -5,9 +6,9 @@ import picamera
 from CONSTS import C
 from RPi import GPIO
 from time import sleep
-from flask import Flask
 from functools import partial
 from piib_gpio import PinMonitor
+from flask import Flask, Response
 
 
 app = Flask('piib_ui')
@@ -40,8 +41,8 @@ def host_status():
 #~ @app.route('/power_led')
 #~ def power_led():
     #~ return monitored_pins[C.KEYWORD_POWER_LED_PIN].status
- 
- 
+
+
 #~ @app.route('/hdd_led')
 #~ def hdd_led():
     #~ return monitored_pins[C.KEYWORD_HDD_LED_PIN].status
@@ -60,7 +61,7 @@ def host_status():
 def power_button_action(action):
     #TODO:
     return "not yet", 501
-    
+
 
 @app.route('/reset_button/<action>')
 def reset_button_action(action):
@@ -76,31 +77,50 @@ def reset_button_action(action):
 def mouse_move(action):
     #TODO: move left, move right, up, down
     return "not yet", 501
-    
+
 
 @app.route('/key/<action>')
 def keyboard(action):
-    #TODO: key down, up, 
+    #TODO: key down, up,
     return "not yet", 501
 
 
 @app.route('/screen')
 def screen():
-    # the "start_preview()" function that all tutorials say to run actually start a visual preview which isn't the desired result here.
-    if display:
-        try:
-            cam = picamera.PiCamera()
-        except picamera.exc.PiCameraMMALError as e:
-            # We've never set up 'cam' and this error tells us there's no signal yet
-            # TODO: return "no signal"
-            pass
-        except picamera.exc.PiCameraRuntimeError as e:
-            # We had a signal, but this error means we lost it
-            #TODO: return "no signal"
-            pass
-    # TODO: regurn a jpeg image (as an rtsp stream?)
-    return "not yet", 501
-    
+    return Response(frame_generator(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+def frame_generator():
+    fin = open('images/no-signal.jpg', 'rb')
+    no_signal = fin.read()
+    fin.close()
+
+    screen_handle = None
+    frame_buffer = io.BytesIO()
+    while True:
+        frame = no_signal
+        if screen_handle:
+            try:
+                frame_buffer.seek(0)
+                screen_handle.capture(frame_buffer, 'jpeg')
+                frame_buffer.truncate()
+                frame_buffer.seek(0)
+                frame = frame_buffer.read()
+            except picamera.exc.PiCameraRuntimeError as e:
+                # We had gotten a picture from the camera at some point, but have since lost signal.
+                # Reset the handle to force a new init of the variable on the next pass of the loop.
+                screen_handle = None
+                # frame = no_signal
+        else:
+            try:
+                screen_handle = picamera.PiCamera()
+                # screen_handle.resolution = (1024, 768)
+            except picamera.exc.PiCameraMMALError as e:
+                # We have never gotten a signal and failed to get one just now.
+                screen_handle = None  # Not sure if we need screen_handle nulled out. Probably not.
+
+        yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
 
 #######################################################################
 # Setup
@@ -127,13 +147,6 @@ def _gpio_setup():
             # Start a thread that monitors the pin
             monitored_pins[name].start()
 
-    #power_toggle()
-    #read_hdd_led_until(max_tries=500)
-    #~ for name,monitored_pin in monitored_pins.items():
-        #~ # Tell the thread that monitors the pin to stop checking.
-        #~ sleep(2)
-        #~ monitored_pin.continue_monitoring = False
-
 
 if __name__ == '__main__':
     logging.basicConfig(format='{"timestamp": "%(asctime)s", '
@@ -144,9 +157,6 @@ if __name__ == '__main__':
     logger.setLevel(getattr(logging, C.LOG_LEVEL.upper(), 'INFO'))
 
     _gpio_setup()
-    global display
-    display = None
-    
-    app.run(host='0.0.0.0', port='5112')
+
+    app.run(host='0.0.0.0', port='5112', threaded=False)
     GPIO.cleanup()
-    picamera.stop_preview()
