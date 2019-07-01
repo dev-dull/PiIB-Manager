@@ -41,8 +41,8 @@ def host_status():
 #~ @app.route('/power_led')
 #~ def power_led():
     #~ return monitored_pins[C.KEYWORD_POWER_LED_PIN].status
- 
- 
+
+
 #~ @app.route('/hdd_led')
 #~ def hdd_led():
     #~ return monitored_pins[C.KEYWORD_HDD_LED_PIN].status
@@ -61,7 +61,7 @@ def host_status():
 def power_button_action(action):
     #TODO:
     return "not yet", 501
-    
+
 
 @app.route('/reset_button/<action>')
 def reset_button_action(action):
@@ -77,11 +77,11 @@ def reset_button_action(action):
 def mouse_move(action):
     #TODO: move left, move right, up, down
     return "not yet", 501
-    
+
 
 @app.route('/key/<action>')
 def keyboard(action):
-    #TODO: key down, up, 
+    #TODO: key down, up,
     return "not yet", 501
 
 
@@ -91,7 +91,6 @@ def screen():
 
 
 def frame_generator():
-    """Video streaming generator function."""
     fin = open('images/no-signal.jpg', 'rb')
     no_signal = fin.read()
     fin.close()
@@ -115,10 +114,10 @@ def frame_generator():
         else:
             try:
                 screen_handle = picamera.PiCamera()
+                # screen_handle.resolution = (1024, 768)
             except picamera.exc.PiCameraMMALError as e:
                 # We have never gotten a signal and failed to get one just now.
-                # screen_handle = None  # Not sure if we need screen_handle nulled out. Probably not.
-                pass
+                screen_handle = None  # Not sure if we need screen_handle nulled out. Probably not.
 
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
@@ -158,8 +157,6 @@ if __name__ == '__main__':
     logger.setLevel(getattr(logging, C.LOG_LEVEL.upper(), 'INFO'))
 
     _gpio_setup()
-    global screen_image
-    screen_image = None
-    
-    app.run(host='0.0.0.0', port='5112')
+
+    app.run(host='0.0.0.0', port='5112', threaded=False)
     GPIO.cleanup()
